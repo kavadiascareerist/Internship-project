@@ -6,6 +6,12 @@ class SubscriptionPage:
         self.title = (By.XPATH, "//h1[text()='Subscription & payments']")
         self.back_button = (By.ID, "backBtn")
         self.upgrade_button = (By.ID, "upgradePlanBtn")
+        #self.subscription_payments=(By.XPATH, "//div[@class='setting-text']")
+        self.subscription_button = (
+            By.XPATH,
+            "//div[@class='setting-text' and normalize-space()='Subscription & payments']"
+        )
+
 
     def is_title_visible(self):
         return self.driver.find_element(*self.title).is_displayed()
