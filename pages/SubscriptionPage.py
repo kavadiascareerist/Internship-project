@@ -21,3 +21,5 @@ class SubscriptionPage:
 
     def is_upgrade_button_visible(self):
         return self.driver.find_element(*self.upgrade_button).is_displayed()
+
+

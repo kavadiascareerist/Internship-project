@@ -1,62 +1,54 @@
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from pages.LoginPage import LoginPage
 from pages.HomePage import HomePage
 from pages.SubscriptionPage import SubscriptionPage
 
+bstack_options = {
+    "os": "Windows",
+    "osVersion": "10",
+    "local": "false",
+    "seleniumVersion": "4.14.0",
+    "buildName": "Subscription Flow Build 1",
+    "sessionName": "Subscription Test"
+}
 
-    options = Options()
-    driver = webdriver.Firefox(options=options)
-else:
-    driver = webdriver.Chrome()
+options = Options()
+options.set_capability("bstack:options", bstack_options)
+options.set_capability("browserName", "Chrome")
+options.set_capability("browserVersion", "latest")
 
-driver.maximize_window()
+driver = webdriver.Remote(
+    command_executor="https://kavadiasnadine_xo7NSM:RVeyucV1rHKSVxRfdyej@hub.browserstack.com/wd/hub",
+    options=options
+)
 
 try:
-    # Step 1: Open login page
-    driver.get("https://soft.reelly.io/sign-in")
+ driver.get("https://soft.reelly.io/sign-in")
 
-    # Step 2: Login
-    login = LoginPage(driver)
-    login.enter_username("kavadiasnadine@gmail.com")
-    login.enter_password("Jesusholdme1!")
-    login.click_continue()
+ login_page = LoginPage(driver)
+ login_page.enter_username("kavadiasnadine@gmail.com")
+ login_page.enter_password("Jesusholdme1!")
+ login_page.click_continue()
 
-    # Step 3: Initialize HomePage
-    home = HomePage(driver)
+ home_page = HomePage(driver)
+ home_page.click_settings()
+ home_page.click_subscription_payments()
 
-    # Wait for Settings button
-    settings_elem = WebDriverWait(driver, 20).until(
-        EC.element_to_be_clickable(home.settings_button)
+ subscription_page = SubscriptionPage(driver)
+ assert subscription_page.is_title_visible()
+ assert subscription_page.is_back_button_visible()
+ assert subscription_page.is_upgrade_button_visible()
+
+ driver.execute_script(
+        'browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"passed","reason":"Subscription verified"}}'
     )
 
-    # Click Settings using JS (safer)
-    driver.execute_script("arguments[0].click();", settings_elem)
+except Exception as e:
+ driver.execute_script(
+        f'browserstack_executor: {{"action": "setSessionStatus", "arguments": {{"status":"failed","reason":"{str(e)}"}}}}')
 
-    # Wait for URL to change to /settings
-    WebDriverWait(driver, 20).until(
-        EC.url_contains("/settings")
-    )
+ raise
 
-    # Wait for Subscription option
-    subscription_elem = WebDriverWait(driver, 20).until(
-        EC.presence_of_element_located(home.subscription_button)
-    )
-
-    # Click Subscription using JS
-    driver.execute_script("arguments[0].click();", subscription_elem)
-
-    # Step 4: Verify Subscription Page
-    subscription = SubscriptionPage(driver)
-
-    assert subscription.is_title_visible(), "Title not visible!"
-    assert subscription.is_back_button_visible(), "Back button not visible!"
-    assert subscription.is_upgrade_button_visible(), "Upgrade button not visible!"
-
-    print("✅ Test Passed Successfully!")
-
-finally:
-    driver.quit()
-
+#finally:
+driver.quit()

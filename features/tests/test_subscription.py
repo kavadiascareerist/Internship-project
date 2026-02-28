@@ -1,47 +1,64 @@
-import time
-from time import sleep
-
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from pages.LoginPage import LoginPage
-from pages.HomePage  import HomePage
+from pages.HomePage import HomePage
 from pages.SubscriptionPage import SubscriptionPage
-from selenium.webdriver.firefox.options import Options
-
-# Initialize Chrome driver
-options = Options()
-options.add_argument("--headless")
-driver = webdriver.Chrome()
-
-driver.get("https://soft.reelly.io/sign-in")
-#driver = webdriver.Firefox(options=options)
-
-# Step 2: Log in
-login = LoginPage(driver)
-login.enter_username("kavadiasnadine@gmail.com")
-time.sleep(2)
-login.enter_password("Jesusholdme1!")
-time.sleep(2)
-login.click_continue()
-sleep(3)
-
-home = HomePage(driver)
-home.click_settings()
-sleep(2)
-
-home.click_subscription_payments()
-subscription = SubscriptionPage(driver)
-sleep(2)
-
-assert subscription.is_title_visible(), "Title not visible!"
-assert subscription.is_back_button_visible(), "Back button not visible!"
-assert subscription.is_upgrade_button_visible(), "Upgrade plan button not visible!"
 
 
+USERNAME = "kavadiasnadine_xo7NSM"
+ACCESS_KEY = "RVeyucV1rHKSVxRfdyej"
 
 
+bstack_options = {
+    "os": "Windows",
+    "osVersion": "10",
+    "buildName": "Subscription Flow Build 1",
+    "sessionName": "Subscription Test",
+    "local": False
+}
+
+chrome_options = Options()
+chrome_options.set_capability("browserName", "Chrome")
+chrome_options.set_capability("browserVersion", "latest")
+chrome_options.set_capability("bstack:options", bstack_options)
 
 
+driver = webdriver.Remote(
+    command_executor=f"https://{USERNAME}:{ACCESS_KEY}@hub.browserstack.com/wd/hub",
+    options=chrome_options
+)
 
+try:
+
+    driver.get("https://soft.reelly.io/sign-in")
+
+
+    login_page = LoginPage(driver)
+    login_page.enter_username("kavadiasnadine@gmail.com")
+    login_page.enter_password("Jesusholdme1!")
+    login_page.click_continue()
+
+    home_page = HomePage(driver)
+    home_page.click_settings()
+    home_page.click_subscription_payments()
+
+    subscription_page = SubscriptionPage(driver)
+    assert subscription_page.is_title_visible()
+    assert subscription_page.is_back_button_visible()
+    assert subscription_page.is_upgrade_button_visible()
+
+    driver.execute_script(
+        'browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"passed","reason":"Subscription verified"}}'
+    )
+
+except Exception as e:
+    driver.execute_script(
+        f'browserstack_executor: {{"action":"setSessionStatus","arguments":{{"status":"failed","reason":"{str(e)}"}}}}'
+    )
+    raise
+
+finally:
+    driver.quit()
 
 
 
