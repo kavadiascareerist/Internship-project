@@ -1,0 +1,1 @@
+[{"uid":"a0551a9873840bbf","name":"User can open SubscriptionPage","time":{"start":1772330410815,"stop":1772330411896,"duration":1081},"status":"broken","severity":"normal"},{"uid":"a910f6a5dd4b856e","name":"User can search for a product","time":{"start":1772330411897,"stop":1772330418827,"duration":6930},"status":"passed","severity":"normal"}]

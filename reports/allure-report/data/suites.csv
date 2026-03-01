@@ -1,0 +1,3 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","1081","User can open SubscriptionPage","","2026-02-28","broken","2026-02-28","","","",""
+"","6930","User can search for a product","","2026-02-28","passed","2026-02-28","","","",""
